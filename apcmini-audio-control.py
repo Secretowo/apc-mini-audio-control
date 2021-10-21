@@ -61,13 +61,13 @@ if __name__ == "__main__":
 	print("APC mini Audio Control by Secret (https://secco.dev/)")
 	while 1:
 		try:
-			aa = ApcMini(None, "APC MINI 1")
+			apc = ApcMini(None, "APC MINI 1")
 		except Exception as e:
 			print(f"\nCouldnt connect to APC mini. ({e})\ntrying again in 5 seconds...")
 			time.sleep(5)
 		else:
 			break
-	aaa = []
+	presses_buttons = []
 	peaks = deque([0]*8)
 	main_speaker = AudioUtilities.GetSpeakers()
 	main_speaker_interface = main_speaker.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
@@ -94,7 +94,7 @@ if __name__ == "__main__":
 	while True:
 		time.sleep(0.001) #prevent the loop from going too fast and using up a bunch of cpu. (20% -> 0.1% cpu usage)
 		currenttime = time.time()
-		for msg in aa.pending_inputs():
+		for msg in apc.pending_inputs():
 			try:
 				if msg.type == "control_change":
 					#if msg.value <= 2:
@@ -109,12 +109,12 @@ if __name__ == "__main__":
 						except IndexError:
 							if not slidererror[msg.control-48] or bypass:
 								slidererror[msg.control-48] = True
-								aa.set(msg.control-48, "red")
+								apc.set(msg.control-48, "red")
 				elif msg.type == "note_on":
 					if msg.note == 98:
-						aa.reset()
+						apc.reset()
 						peaks = deque([0]*8)
-						aaa = []
+						presses_buttons = []
 						lastname = 0
 						currentmatrix = [0]*64
 					elif msg.note == 64:
@@ -130,18 +130,18 @@ if __name__ == "__main__":
 					#elif msg.note == 70:
 					#	bypass = not bypass
 					#	if bypass:
-					#		aa.set(70, "red")
+					#		apc.set(70, "red")
 					#	else:
-					#		aa.set(70, 0)
+					#		apc.set(70, 0)
 					elif msg.note == 85:
 						keyboard.press_and_release('m')
 					elif msg.note == 86:
 						mode = not mode
-						aa.reset()
+						apc.reset()
 						if mode:
-							aa.set(86, 1)
+							apc.set(86, 1)
 						else:
-							aa.set(86, 0)
+							apc.set(86, 0)
 					elif msg.note == 87:
 						sspeed -= 0.01
 						print(sspeed)
@@ -153,19 +153,19 @@ if __name__ == "__main__":
 						reset_sessions()
 						newlen = len(sessions)
 						for i in range(oldlen, newlen): #turn on if we have more
-							aa.set(64+i, 1)
+							apc.set(64+i, 1)
 						for i in range(newlen, oldlen): #turn off if we have less
-							aa.set(64+i, 0)
+							apc.set(64+i, 0)
 						print(" | ".join([session.Process.name() if session.Process else "System" for session in sessions]))
 						lastname = 0
 					elif msg.note < 64 and currentmatrix[msg.note]:
-						aa.set(msg.note, 0)
-					elif msg.note in aaa:
-						aa.set(msg.note, 0)
-						aaa.remove(msg.note)
+						apc.set(msg.note, 0)
+					elif msg.note in presses_buttons:
+						apc.set(msg.note, 0)
+						presses_buttons.remove(msg.note)
 					else:
-						aa.set(msg.note, 1)
-						aaa.append(msg.note)		
+						apc.set(msg.note, 1)
+						presses_buttons.append(msg.note)		
 			except Exception:
 				print("\n:( looks like the script crashed. Heres some info:")
 				print(msg)
@@ -180,9 +180,9 @@ if __name__ == "__main__":
 				for i, session in enumerate(sessions):
 					if session.Process:
 						if currentname == session.Process.name():
-							aa.set(64+i, "red_blinking")
+							apc.set(64+i, "red_blinking")
 						else:
-							aa.set(64+i, "red")
+							apc.set(64+i, "red")
 		if (currenttime - peakslasttime) >= sspeed:
 			peakslasttime = currenttime
 			#channel_count = main_peaks.GetMeteringChannelCount()
@@ -200,7 +200,7 @@ if __name__ == "__main__":
 							else:
 								newval = 5
 						if currentmatrix[8*j+i] != newval or bypass:
-							aa.set(8*j+i, newval)
+							apc.set(8*j+i, newval)
 							currentmatrix[8*j+i] = newval
 			else:
 				#print(peaks)
@@ -217,10 +217,10 @@ if __name__ == "__main__":
 							else:
 								newval = 5
 						if currentmatrix[8*j+i] != newval or bypass:
-							aa.set(8*j+i, newval)
+							apc.set(8*j+i, newval)
 							currentmatrix[8*j+i] = newval
 		if (currenttime - activitylasttime) >= 0.2:
 			activitylasttime = currenttime
-			print(f"{aa.activity*5:3}/s |{aa.activity:3}", "▒"*int(aa.activity/2), " "*(100-aa.activity))
-			aa.activity = 0
+			print(f"{apc.activity*5:3}/s |{apc.activity:3}", "▒"*int(apc.activity/2), " "*(100-apc.activity))
+			apc.activity = 0
 
