@@ -67,7 +67,7 @@ if __name__ == "__main__":
 			time.sleep(5)
 		else:
 			break
-	presses_buttons = []
+	pressed_buttons = []
 	peaks = deque([0]*8)
 	main_speaker = AudioUtilities.GetSpeakers()
 	main_speaker_interface = main_speaker.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
@@ -114,7 +114,7 @@ if __name__ == "__main__":
 					if msg.note == 98:
 						apc.reset()
 						peaks = deque([0]*8)
-						presses_buttons = []
+						pressed_buttons = []
 						lastname = 0
 						currentmatrix = [0]*64
 					elif msg.note == 64:
@@ -156,16 +156,15 @@ if __name__ == "__main__":
 							apc.set(64+i, 1)
 						for i in range(newlen, oldlen): #turn off if we have less
 							apc.set(64+i, 0)
-						print(" | ".join([session.Process.name() if session.Process else "System" for session in sessions]))
 						lastname = 0
 					elif msg.note < 64 and currentmatrix[msg.note]:
 						apc.set(msg.note, 0)
-					elif msg.note in presses_buttons:
+					elif msg.note in pressed_buttons:
 						apc.set(msg.note, 0)
-						presses_buttons.remove(msg.note)
+						pressed_buttons.remove(msg.note)
 					else:
 						apc.set(msg.note, 1)
-						presses_buttons.append(msg.note)		
+						pressed_buttons.append(msg.note)		
 			except Exception:
 				print("\n:( looks like the script crashed. Heres some info:")
 				print(msg)
