@@ -1,0 +1,5 @@
+keyboard
+pywin32
+psutil
+pycaw
+python-rtmidi
