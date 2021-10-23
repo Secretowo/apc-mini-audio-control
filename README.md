@@ -1,6 +1,8 @@
 # apc-mini-audio-control
 Control Audio on a per-process level using an AKAI Professional APC mini.
-Requires [apc-mini-py](https://github.com/Secretowo/apc-mini-py) and a bunch of other things (find out yourself by the ImportErrors...)
+
+Requires [apc-mini-py](https://github.com/Secretowo/apc-mini-py) and the things in requirements.txt
+
 The code is a mess. i know. but it works.
 
 # What do the buttons do?:
