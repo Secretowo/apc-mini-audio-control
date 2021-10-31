@@ -83,13 +83,21 @@ if __name__ == "__main__":
 	slidererror = [False]*8
 	currentmatrix = [0]*64
 	lastname = ""
-	sspeed = 0.1
+	speed = 0.1
 	mode = False
 	def reset_sessions():
 		global sessions, sessions_meter
 		sessions = [sess for i, sess in enumerate(AudioUtilities.GetAllSessions()) if sess.Process and i<8] #limit to 8 processes
 		print(" | ".join([session.Process.name() if session.Process else "System" for session in sessions]))
 		sessions_meter = [session._ctl.QueryInterface(IAudioMeterInformation) for session in sessions]
+	def reset():
+		global peaks, pressed_buttons, lastname, currentmatrix
+		apc.reset()
+		peaks = deque([0]*8)
+		pressed_buttons = []
+		lastname = 0
+		currentmatrix = [0]*64
+	apc.reset()
 	reset_sessions()
 	while True:
 		time.sleep(0.001) #prevent the loop from going too fast and using up a bunch of cpu. (20% -> 0.1% cpu usage)
@@ -112,11 +120,7 @@ if __name__ == "__main__":
 								apc.set(msg.control-48, "red")
 				elif msg.type == "note_on":
 					if msg.note == 98:
-						apc.reset()
-						peaks = deque([0]*8)
-						pressed_buttons = []
-						lastname = 0
-						currentmatrix = [0]*64
+						reset()
 					elif msg.note == 64:
 						win32api.keybd_event(VK_VOLUME_UP, 0, KEYEVENTF_EXTENDEDKEY, 0)
 					elif msg.note == 65:
@@ -136,18 +140,18 @@ if __name__ == "__main__":
 					elif msg.note == 85:
 						keyboard.press_and_release('m')
 					elif msg.note == 86:
+						reset()
 						mode = not mode
-						apc.reset()
 						if mode:
 							apc.set(86, 1)
 						else:
 							apc.set(86, 0)
 					elif msg.note == 87:
-						sspeed -= 0.01
-						print(sspeed)
+						speed -= 0.01
+						print(speed)
 					elif msg.note == 88:
-						sspeed += 0.01
-						print(sspeed)
+						speed += 0.01
+						print(speed)
 					elif msg.note == 71:
 						oldlen = len(sessions)
 						reset_sessions()
@@ -182,7 +186,7 @@ if __name__ == "__main__":
 							apc.set(64+i, "red_blinking")
 						else:
 							apc.set(64+i, "red")
-		if (currenttime - peakslasttime) >= sspeed:
+		if (currenttime - peakslasttime) >= speed:
 			peakslasttime = currenttime
 			#channel_count = main_peaks.GetMeteringChannelCount()
 			#channels = main_peaks.GetChannelsPeakValues(channel_count)
