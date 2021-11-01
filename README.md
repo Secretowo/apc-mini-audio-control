@@ -10,7 +10,7 @@ cd apc-mini-audio-control
 pip install -r requirements.txt
 ```
 Run like any other python script:
-`python ./apcmini-audio-control.py`
+`python ./apc-mini-audio-control.py`
 
 # What do the buttons do?:
 Button | Function
