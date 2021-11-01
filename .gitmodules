@@ -1,0 +1,3 @@
+[submodule "apcmini"]
+	path = apcmini
+	url = https://github.com/Secretowo/apc-mini-py
