@@ -8,6 +8,7 @@ The code is a mess. i know. but it works.
 git clone --recurse-submodules https://github.com/Secretowo/apc-mini-audio-control.git
 cd apc-mini-audio-control
 pip install -r requirements.txt
+python apc-mini-audio-control.py
 ```
 Run like any other python script:
 `python ./apc-mini-audio-control.py`
