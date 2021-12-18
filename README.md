@@ -4,6 +4,7 @@ Control Audio on a per-process level using an AKAI Professional APC mini.
 The code is a mess. i know. but it works.
 
 # Installation
+You might need to install [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/downloads/) to install some of the python modules.
 ```
 git clone --recurse-submodules https://github.com/Secretowo/apc-mini-audio-control.git
 cd apc-mini-audio-control
